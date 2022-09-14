@@ -26,12 +26,12 @@ ui <- fluidPage(theme=shinytheme("yeti"),
                                  style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
                   ),
                   mainPanel(
-                    plotOutput("kmplot") %>% withSpinner(color="#0dc5c1")
+                    plotOutput("kmplot", width = "100%") %>% withSpinner(color="#0dc5c1")
                   )
                 )
 )
 server <- function(input, output, session){
-  updateSelectizeInput(session, 'input_gene', choices = as.vector(genetpms[[1]]), server = TRUE)
+  updateSelectizeInput(session, 'input_gene', choices = as.vector(genetpms[[1]]), server=TRUE)
   kmplotobj<-eventReactive(
     input$submit_btn, {
       clinicalfile<-subset(clinicalfile, select=c(case_submitter_id, days_to_death,  vital_status))
@@ -66,12 +66,9 @@ server <- function(input, output, session){
   
   output$kmplot<-renderPlot({
     ggsurvplot(kmplotobj(), pval=TRUE, legend.labs=c("High", "Low"),
-               title=paste("Kaplan-Meier Curve for Cholangiocarcinoma Survival based on Expression of", input$input_gene, "Gene"),
-               legend.title="Gene Expression")
+               title=paste("Kaplan-Meier Curve for Cholangiocarcinoma Survival based on Expression of", isolate(input$input_gene), "Gene"),
+               legend.title="Gene Expression") 
   })
   
 
 }
-
-# Run the application 
-shinyApp(ui = ui, server = server)
